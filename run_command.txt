@@ -1,0 +1,2 @@
+Run with:
+python -m scripts.chat_cli --tokenizer_path "data/discord" --model_path "C:\Users\ryanw\.cache\nanochat\base_checkpoints\d8\model_001500.pt"
