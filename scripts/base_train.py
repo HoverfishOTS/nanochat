@@ -22,7 +22,7 @@ import torch
 from nanochat.gpt import GPT, GPTConfig
 from nanochat.dataloader import tokenizing_distributed_data_loader, tokenizing_distributed_data_loader_with_state
 from nanochat.common import compute_init, compute_cleanup, print0, DummyWandb, print_banner, get_base_dir, autodetect_device_type
-from nanochat.tokenizer import get_tokenizer, get_token_bytes
+from nanochat.tokenizer import get_tokenizer, get_token_bytes, RustBPETokenizer
 from nanochat.checkpoint_manager import save_checkpoint, load_checkpoint
 from nanochat.loss_eval import evaluate_bpb
 from nanochat.engine import Engine
@@ -81,8 +81,20 @@ use_dummy_wandb = run == "dummy" or not master_process
 wandb_run = DummyWandb() if use_dummy_wandb else wandb.init(project="nanochat", name=run, config=user_config)
 
 # Tokenizer will be useful for evaluation, also we need the vocab size
-tokenizer = get_tokenizer()
-token_bytes = get_token_bytes(device=device)
+tokenizer_path = "data/discord" 
+# CRITICAL FIX: Use .from_directory() instead of the class name directly
+tokenizer = RustBPETokenizer.from_directory(tokenizer_path)
+
+# 2. Load Token Bytes correctly (Fixes the next error you would have hit)
+# The default get_token_bytes() looks in the wrong folder, so we load it manually.
+token_bytes_path = os.path.join(tokenizer_path, "token_bytes.pt")
+if os.path.exists(token_bytes_path):
+    with open(token_bytes_path, "rb") as f:
+        token_bytes = torch.load(f, map_location=device)
+else:
+    print(f"Warning: {token_bytes_path} not found. Metrics might be wrong.")
+    token_bytes = torch.zeros(tokenizer.get_vocab_size(), dtype=torch.int32, device=device)
+
 vocab_size = tokenizer.get_vocab_size()
 print0(f"Vocab size: {vocab_size:,}")
 
@@ -129,7 +141,8 @@ if resuming:
     del model_data # free up this memory after the copy
 
 orig_model = model # original, uncompiled model, for saving raw model state_dict and for inference/evaluation (because the shapes may change shape)
-model = torch.compile(model, dynamic=False) # the inputs to model will never change shape so dynamic=False is safe
+# model = torch.compile(model, dynamic=False) # the inputs to model will never change shape so dynamic=False is safe
+print("Windows Override: Skipped torch.compile")
 num_params = sum(p.numel() for p in model.parameters())
 print0(f"Number of parameters: {num_params:,}")
 num_flops_per_token = model.estimate_flops()

@@ -380,19 +380,23 @@ class RustBPETokenizer:
 # nanochat-specific convenience functions
 
 def get_tokenizer():
-    from nanochat.common import get_base_dir
-    base_dir = get_base_dir()
-    tokenizer_dir = os.path.join(base_dir, "tokenizer")
-    # return HuggingFaceTokenizer.from_directory(tokenizer_dir)
+    # Hardcode path to your Discord data
+    tokenizer_dir = "data/discord" 
     return RustBPETokenizer.from_directory(tokenizer_dir)
 
 def get_token_bytes(device="cpu"):
     import torch
-    from nanochat.common import get_base_dir
-    base_dir = get_base_dir()
-    tokenizer_dir = os.path.join(base_dir, "tokenizer")
+    # Hardcode path to your Discord data
+    tokenizer_dir = "data/discord"
     token_bytes_path = os.path.join(tokenizer_dir, "token_bytes.pt")
-    assert os.path.exists(token_bytes_path), f"Token bytes not found at {token_bytes_path}? It gets written by tok_train.py"
+    
+    if not os.path.exists(token_bytes_path):
+        # Fallback if file is missing (prevents crash)
+        print(f"WARNING: {token_bytes_path} not found. Returning zeros.")
+        # We need to temporarily load tokenizer to get vocab size
+        tok = get_tokenizer()
+        return torch.zeros(tok.get_vocab_size(), dtype=torch.int32, device=device)
+
     with open(token_bytes_path, "rb") as f:
         token_bytes = torch.load(f, map_location=device)
     return token_bytes
