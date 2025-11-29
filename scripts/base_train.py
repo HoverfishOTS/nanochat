@@ -81,7 +81,7 @@ use_dummy_wandb = run == "dummy" or not master_process
 wandb_run = DummyWandb() if use_dummy_wandb else wandb.init(project="nanochat", name=run, config=user_config)
 
 # Tokenizer will be useful for evaluation, also we need the vocab size
-tokenizer_path = "data/discord" 
+tokenizer_path = "data/am_woman" 
 # CRITICAL FIX: Use .from_directory() instead of the class name directly
 tokenizer = RustBPETokenizer.from_directory(tokenizer_path)
 

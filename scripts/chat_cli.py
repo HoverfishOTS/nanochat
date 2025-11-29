@@ -9,14 +9,14 @@ from nanochat.tokenizer import RustBPETokenizer
 from nanochat.engine import Engine
 
 # --- CONFIG ---
-BOT_PERSONA = "MONKE KISSES PEOPLE WITH AIDS" 
+BOT_PERSONA = "khristian" 
 # ----------------
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_path', type=str, required=True)
 parser.add_argument('--tokenizer_path', type=str, required=True)
-parser.add_argument('--temperature', type=float, default=0.6) 
-parser.add_argument('--top_k', type=int, default=40)
+parser.add_argument('--temperature', type=float, default=0.8) 
+parser.add_argument('--top_k', type=int, default=50)
 args = parser.parse_args()
 
 device = "cuda" if torch.cuda.is_available() else "cpu"

@@ -5,8 +5,13 @@ import pandas as pd # You might need: uv pip install pandas pyarrow
 from pathlib import Path
 
 # --- CONFIG ---
-input_file = 'channel_export.json'
-output_dir = 'data/discord'        
+# For Monke, use the provided channel export JSON
+# input_file = 'channel_export.json'
+# output_dir = 'data/discord'        
+
+# For AW, use below
+input_file = "data/am_woman/am_woman.json"
+output_dir = "data/am_woman"
 val_split = 0.1
 
 def prepare():

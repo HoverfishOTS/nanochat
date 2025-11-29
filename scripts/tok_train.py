@@ -27,7 +27,7 @@ print(f"vocab_size: {args.vocab_size:,}")
 
 def text_iterator():
     # Hardcoded path to discord data
-    data_dir = "data/discord"
+    data_dir = "data/am_woman"
     files = sorted(glob.glob(os.path.join(data_dir, "*.parquet")))
     
     if not files:
@@ -63,8 +63,8 @@ train_time = t1 - t0
 print(f"Training time: {train_time:.2f}s")
 
 # -----------------------------------------------------------------------------
-# Save the tokenizer to data/discord
-tokenizer_dir = "data\discord"
+# Save the tokenizer to data/am_woman
+tokenizer_dir = "data/am_woman"
 print(f"Saving tokenizer to {tokenizer_dir}...")
 tokenizer.save(tokenizer_dir)
 

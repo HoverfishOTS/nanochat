@@ -381,13 +381,13 @@ class RustBPETokenizer:
 
 def get_tokenizer():
     # Hardcode path to your Discord data
-    tokenizer_dir = "data/discord" 
+    tokenizer_dir = "data/am_woman" 
     return RustBPETokenizer.from_directory(tokenizer_dir)
 
 def get_token_bytes(device="cpu"):
     import torch
     # Hardcode path to your Discord data
-    tokenizer_dir = "data/discord"
+    tokenizer_dir = "data/am_woman"
     token_bytes_path = os.path.join(tokenizer_dir, "token_bytes.pt")
     
     if not os.path.exists(token_bytes_path):

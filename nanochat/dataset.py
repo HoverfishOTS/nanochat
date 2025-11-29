@@ -24,7 +24,7 @@ BASE_URL = "https://huggingface.co/datasets/karpathy/fineweb-edu-100b-shuffle/re
 MAX_SHARD = 1822 # the last datashard is shard_01822.parquet
 index_to_filename = lambda index: f"shard_{index:05d}.parquet" # format of the filenames
 base_dir = get_base_dir()
-DATA_DIR = os.path.abspath("data/discord")
+DATA_DIR = os.path.abspath("data/am_woman")
 
 # Verify it works
 print(f"DEBUG: Dataset looking in: {DATA_DIR}")
