@@ -21,10 +21,10 @@ BOT_PERSONA = "khristian"
 # 3. Paths to best model
 TOKENIZER_PATH = "data/am_woman"
 # Update this to latest checkpoint
-MODEL_PATH = r"C:\\Users\\ryanw\\.cache\\nanochat\\base_checkpoints\\am_woman\\model_001500.pt"
+MODEL_PATH = r"C:\\Users\\ryanw\\.cache\\nanochat\\base_checkpoints\\am_woman_v2\\model_002000.pt"
 
 # 4. Generation Settings
-TEMPERATURE = 0.5  # Creativity
+TEMPERATURE = 1.2  # Creativity
 TOP_K = 50         # Stability
 # ---------------------
 
@@ -42,12 +42,12 @@ if "model_config" in checkpoint:
     config_args = checkpoint["model_config"]
     state_dict = checkpoint["model"]
 else:
-    print("Warning: No config found. Using Depth 8 fallback...")
+    print("Warning: No config found. Using Depth 12 fallback...")
     config_args = dict(
-        n_layer=8,     # Change to 8 if using Baby Model
-        n_head=4,       # Change to 4 if using Baby Model
-        n_kv_head=4,    # Change to 4 if using Baby Model
-        n_embd=512,     # Change to 512 if using Baby Model
+        n_layer=12,     # Change to 12 for updated model
+        n_head=6,       # Change to 6 for updated model
+        n_kv_head=6,    # Change to 6 for updated model
+        n_embd=768,     # Change to 768 for updated model
         vocab_size=tokenizer.get_vocab_size()
     )
     state_dict = checkpoint
