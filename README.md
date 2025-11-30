@@ -1,3 +1,54 @@
+# CS 4200 Class Project
+## Technical Implementation
+
+### Core Architecture
+This project is built on top of [nanochat](https://github.com/karpathy/nanochat), a modern, minimalist implementation of a Transformer (GPT-style) language model. Unlike standard GPT-2, this architecture includes modern enhancements used in Llama and GPT-4:
+* **Rotary Positional Embeddings (RoPE):** Replaces absolute positional embeddings for better context handling.
+* **RMSNorm:** Used instead of LayerNorm for training stability.
+* **SwiGLU / ReLU^2:** Modern activation functions (we used ReLU^2 for efficiency).
+* **Tokenizer:** A custom Byte-Pair Encoding (BPE) tokenizer trained specifically on our Discord server's vernacular (slang, emojis, usernames).
+
+### 1. Data Pipeline
+The training data was sourced from Discord chat logs (JSON format) and processed into a format compatible with the pre-training objective.
+* **Extraction:** Used `DiscordChatExporter` to dump text channels.
+* **Flattening:** Converted structured JSON into raw text logs (`User: Message\n`) to teach the model the natural flow of conversation.
+* **Sharding:** Processed raw text into `.parquet` shards using `pandas` and `pyarrow`, splitting the data into 90% training and 10% validation sets.
+
+### 2. Custom Training Pipeline (Modifications)
+To adapt the `nanochat` repository (originally designed for 8x H100 server nodes) to run on a single consumer GPU (RTX 4090) on Windows, several significant modifications were made:
+
+* **Windows Compatibility:**
+    * Disabled `torch.compile` in `scripts/base_train.py` and `nanochat/muon.py` to bypass Triton compiler incompatibilities on Windows.
+    * Replaced `torchrun` distributed logic with direct `python -m` execution for single-device training.
+* **Custom Data Loader:**
+    * Patched `nanochat/dataset.py` and `nanochat/tokenizer.py` to accept local directory paths (`data/am_woman`) instead of defaulting to HuggingFace web datasets.
+    * Fixed an infinite loop bug in `dataloader.py` that occurred when training on small datasets (< 1GB) by forcing the iterator to reset correctly at the end of an epoch.
+* **Optimization:**
+    * **Architecture:** Trained a "Baby GPT" (Depth=8, Width=512) and a "Small GPT" (Depth=12, Width=768).
+    * **Regularization:** Added `weight_decay=0.1` to prevent the model from overfitting ("parroting") exact messages from the small dataset.
+    * **OOM Prevention:** Disabled the "CORE" academic benchmark suite (`--core_metric_every=-1`) to prevent context window overflows during evaluation.
+
+### 3. Inference & Chat Interface
+A custom inference script (`scripts/chat_cli.py`) was developed to turn the "Document Completer" base model into a Chatbot:
+* **Persona Prompting:** The model is prompted with a structured context (`Unknown: [Input]\nTargetUser:`) to force it into the specific persona of the user we are mimicking.
+* **Stop-Token Logic:** Implemented a custom generation loop that halts inference immediately upon generating a newline character (`\n`). This forces the bot to send concise, single-message replies rather than hallucinating an entire fake conversation.
+* **Dynamic Config:** Implemented a fallback configuration loader to handle checkpoints that saved weights without architecture metadata.
+
+### How to Reproduce
+
+**Train Tokenizer:**
+```bash
+uv run python -m scripts.tok_train --input_dir "data/am_woman" --vocab_size 4096
+```
+**Train Model:**
+```bash
+python -m scripts.base_train --data_dir="data/am_woman" --model_tag="v1_run" --depth=8 --num_iterations=1500 --device_batch_size=16 --weight_decay=0.1 --device_type="cuda" --core_metric_every=-1
+```
+**Chat:**
+```bash
+python -m scripts.chat_cli --tokenizer_path "data/am_woman" --model_path "path/to/checkpoint.pt"
+```
+
 # nanochat
 
 ![nanochat logo](dev/nanochat.png)

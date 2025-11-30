@@ -7,3 +7,5 @@ report.md
 eval_bundle/
 *.json
 secret.txt
+base_checkpoints/
+data/fineweb/
