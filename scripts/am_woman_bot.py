@@ -19,9 +19,9 @@ with open(secret_path, 'r') as f:
 BOT_PERSONA = "khristian"
 
 # 3. Paths to best model
-TOKENIZER_PATH = "data/am_woman"
+TOKENIZER_PATH = "data/fineweb"
 # Update this to latest checkpoint
-MODEL_PATH = r"C:\\Users\\ryanw\\.cache\\nanochat\\base_checkpoints\\am_woman_v2\\model_002000.pt"
+MODEL_PATH = r"base_checkpoints\\am_woman_v2\\model_002000.pt"
 
 # 4. Generation Settings
 TEMPERATURE = 1.2  # Creativity

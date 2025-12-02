@@ -27,7 +27,7 @@ print(f"vocab_size: {args.vocab_size:,}")
 
 def text_iterator():
     # Hardcoded path to discord data
-    data_dir = "data/am_woman"
+    data_dir = "data/fineweb"
     files = sorted(glob.glob(os.path.join(data_dir, "*.parquet")))
     
     if not files:
