@@ -19,7 +19,7 @@ with open(secret_path, 'r') as f:
 BOT_PERSONA = "khristian"
 
 # 3. Paths to best model
-TOKENIZER_PATH = "data/fineweb"
+TOKENIZER_PATH = "data/am_woman"
 # Update this to latest checkpoint
 MODEL_PATH = r"base_checkpoints\\am_woman_v2\\model_002000.pt"
 
@@ -76,7 +76,9 @@ async def on_message(message):
         return
 
     # 2. (Optional) Only reply if mentioned, or in specific channels
-    if not client.user.mentioned_in(message): return
+    # if not client.user.mentioned_in(message): return
+    # if message.channel.id != "1445544188874719273":
+    #     return
 
     # 3. Construct Prompt
     # We format it exactly like the training data: "User: Message\nBot: "
@@ -113,8 +115,8 @@ async def on_message(message):
                     word = tokenizer.decode([token])
                     
                     # STOP CONDITION: Newline means it's trying to impersonate someone else
-                    if "\n" in word:
-                        break
+                    # if "\n" in word:
+                    #     break
                     
                     response_text += word
 
